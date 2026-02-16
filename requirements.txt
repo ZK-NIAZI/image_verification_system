@@ -1,0 +1,9 @@
+# Face Detection
+mediapipe           # lightweight face detection
+
+# Image Processing 
+opencv-python   # Laplacian blur check
+numpy           # Pixel intensity
+
+# Image Utility 
+Pillow             # Image open/save helper
