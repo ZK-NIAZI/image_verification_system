@@ -136,3 +136,95 @@ image_verification_system/
 | Lighting range | 40 to 200 | Covers normal indoor and outdoor lighting |
 
 ---
+
+## Day 2 — Face Detection Implementation
+
+**Focus:** Implement exactly one face validation using MediaPipe Tasks API
+
+---
+
+### What Was Built
+
+A `face_detector.py` module inside `src/` that takes any image and checks if exactly one human face is present.
+
+---
+
+### Issue Found & Fixed
+
+During implementation, `mp.solutions.face_detection` threw an attribute error on MediaPipe `0.10+` because Google removed the `solutions` API in newer versions.
+
+**Fix applied:** Switched to the new **MediaPipe Tasks API** which works on all versions `0.10+`. This required downloading the `blaze_face_short_range.tflite` model file and placing it in the `models/` folder.
+
+```
+models/
+└── blaze_face_short_range.tflite   ← downloaded separately
+```
+
+---
+
+### How the Detection Works
+
+1. Check model file is loaded
+2. Check image is valid and not None
+3. Convert image from BGR (OpenCV) → RGB (MediaPipe requirement)
+4. Wrap image in `mp.Image()` format
+5. Run `_detector.detect()` — MediaPipe scans for face patterns
+6. Count faces in `detection_result.detections` list
+7. Return result based on count
+
+---
+
+### Validation Rules
+
+| Face Count | Status Code | Message |
+|---|---|---|
+| 0 | `NO_FACE` | No face detected |
+| 1 | `SUCCESS` | Face verified |
+| 2 or more | `MULTIPLE_FACES` | Multiple faces detected |
+| Image is None | `INVALID_IMAGE` | Image could not be loaded |
+| Model missing | `MODEL_NOT_FOUND` | Model file not found |
+
+---
+
+### Confidence Threshold
+
+MediaPipe is set to `min_detection_confidence=0.6` — meaning it only counts a face if it is at least **60% confident** it found one. This prevents false detections from posters, photos on walls, or unclear shapes.
+
+---
+
+### Result Dictionary Format
+
+Every call to `detect_face()` always returns this structure:
+
+```python
+{
+    "status"     : "SUCCESS",         # error code for your logic
+    "face_count" : 1,                 # exact number of faces found
+    "message"    : "Face verified."   # human readable text for user
+}
+```
+
+---
+
+### Files Added on Day 2
+
+| File | Purpose |
+|---|---|
+| `src/face_detector.py` | Main face detection logic |
+| `tests/test_day2.py` | Tests for all 3 scenarios |
+| `models/blaze_face_short_range.tflite` | MediaPipe model file |
+
+---
+
+### Test Results
+
+| Test Image | Expected | Result |
+|---|---|---|
+| `assets/no_face.jpg` | `NO_FACE` | ✅ Pass |
+| `assets/one_face.jpg` | `SUCCESS` | ✅ Pass |
+| `assets/two_faces.jpg` | `MULTIPLE_FACES` | ✅ Pass |
+| `None` input | `INVALID_IMAGE` | ✅ Pass |
+
+---
+
+*Status: Day 2 Complete — Face Detection Working*
