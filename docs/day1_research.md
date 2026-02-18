@@ -228,3 +228,163 @@ Every call to `detect_face()` always returns this structure:
 ---
 
 *Status: Day 2 Complete — Face Detection Working*
+
+
+## Day 3 — Blur Detection Implementation
+
+**Focus:** Implement clarity check using Laplacian variance
+
+---
+
+### What Was Built
+
+A `clarity_check.py` module inside `src/` that detects if an image is too blurry or acceptably clear for verification purposes.
+
+---
+
+### How Blur Detection Works
+
+Uses **Laplacian variance** method:
+
+1. Convert image to grayscale
+2. Apply Laplacian operator (edge detection filter)
+3. Calculate variance of the result
+4. Compare against threshold
+
+**High variance = many sharp edges = clear image**  
+**Low variance = few/soft edges = blurry image**
+
+---
+
+### Code Implementation
+
+```python
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+laplacian = cv2.Laplacian(gray, cv2.CV_64F)
+variance = laplacian.var()
+
+if variance < BLUR_THRESHOLD:
+    return TOO_BLURRY
+else:
+    return CLEAR
+```
+
+---
+
+### Critical Discovery — Content Type Matters
+
+During testing, discovered that **variance depends on image content**, not just blur:
+
+| Content Type | Typical Variance Range |
+|---|---|
+| Face photos (smooth skin) | 30-80 |
+| Landscape/objects (textures) | 80-200+ |
+| Blurry face photos | 10-30 |
+
+**Key Learning:** Since this is a face verification system, the threshold must be tuned specifically for face photos, not general images.
+
+---
+
+### Threshold Calibration Process
+
+**Initial attempt:** `BLUR_THRESHOLD = 100` (from general research)  
+**Problem:** Too strict — rejected clear face photos with variance 45-85
+
+**Solution:** Test with actual face photos and adjust threshold based on results.
+
+**Test Results with Face Photos:**
+- Clear face selfie: variance = 45
+- Blurry face selfie: variance = 18
+- **Optimal threshold: 30** (sits between blurry and clear)
+
+---
+
+### Final Threshold Value
+
+```python
+BLUR_THRESHOLD = 30  # Tuned for face verification
+```
+
+**Rationale:** 
+- Accepts clear face photos (variance 40-80)
+- Rejects blurry face photos (variance under 30)
+- Specific to face verification use case
+
+---
+
+### Validation Rules
+
+| Variance | Status | Action |
+|---|---|---|
+| Under 30 | `TOO_BLURRY` | Reject |
+| 30 and above | `CLEAR` | Accept |
+| Image is None | `INVALID_IMAGE` | Reject |
+
+---
+
+### Result Dictionary Format
+
+Every call to `check_clarity()` returns:
+
+```python
+{
+    "status"    : "CLEAR",           # or TOO_BLURRY / INVALID_IMAGE
+    "variance"  : 45.23,             # actual calculated variance
+    "threshold" : 30,                # threshold used for comparison
+    "message"   : "Image is clear"   # human readable explanation
+}
+```
+
+---
+
+### Files Added on Day 3
+
+| File | Purpose |
+|---|---|
+| `src/clarity_check.py` | Blur detection logic using Laplacian variance |
+| `config.py` | Centralized configuration with BLUR_THRESHOLD |
+| `tests/test_day3.py` | Tests with variance table for threshold tuning |
+
+---
+
+### Configuration Structure
+
+Created `config.py` at project root to store all thresholds in one place:
+
+```python
+BLUR_THRESHOLD = 30              # Clarity check
+FACE_DETECTION_CONFIDENCE = 0.6  # Face detection
+LIGHTING_MIN = 40                # Lighting check (Day 4)
+LIGHTING_MAX = 200               # Lighting check (Day 4)
+```
+
+**Benefits:**
+- Easy to adjust thresholds without changing code
+- Single source of truth for all settings
+- Well-documented with comments explaining each value
+
+---
+
+### Test Results
+
+| Test Image | Variance | Expected | Result |
+|---|---|---|---|
+| `blurry_image.jpg` | 3.83 | `TOO_BLURRY` | ✅ Pass |
+| `clear_image.jpg` | 186.62 | `CLEAR` | ✅ Pass |
+| `one_face.jpg` | 45.39 | `CLEAR` | ✅ Pass |
+| `two_face.jpg` | 41.67 | `CLEAR` | ✅ Pass |
+| `None` input | 0 | `INVALID_IMAGE` | ✅ Pass |
+
+---
+
+### Lessons Learned
+
+1. **Generic thresholds don't work** — must calibrate for your specific use case
+2. **Content type affects variance** — faces have lower variance than landscapes
+3. **Test with representative images** — use actual face photos, not random images
+4. **Variance is not blur alone** — it measures edge density in the image
+5. **Threshold tuning is essential** — always test with your own images and adjust
+
+---
+
+*Status: Day 3 Complete — Blur Detection Working with Optimized Threshold*
