@@ -388,3 +388,180 @@ LIGHTING_MAX = 200               # Lighting check (Day 4)
 ---
 
 *Status: Day 3 Complete — Blur Detection Working with Optimized Threshold*
+
+
+## Day 4 — Lighting Detection Implementation
+
+**Focus:** Implement lighting validation using mean pixel intensity
+
+---
+
+### What Was Built
+
+A `lighting_check.py` module inside `src/` that detects if an image has acceptable lighting or is too dark/too bright for verification purposes.
+
+---
+
+### How Lighting Detection Works
+
+Uses **mean pixel intensity** method:
+
+1. Convert image to grayscale
+2. Calculate mean (average) of all pixel values
+3. Compare against min/max thresholds
+
+**Pixel intensity scale:**
+- 0 = pure black
+- 128 = medium gray
+- 255 = pure white
+
+**Low mean = image is too dark**  
+**Medium mean = good lighting**  
+**High mean = image is too bright/overexposed**
+
+---
+
+### Code Implementation
+
+```python
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+mean_intensity = np.mean(gray)
+
+if mean_intensity < LIGHTING_MIN:
+    return TOO_DARK
+elif mean_intensity > LIGHTING_MAX:
+    return TOO_BRIGHT
+else:
+    return GOOD_LIGHTING
+```
+
+---
+
+### Threshold Values
+
+Using the values defined in Day 1 research:
+
+```python
+LIGHTING_MIN = 40   # Below this = too dark
+LIGHTING_MAX = 200  # Above this = too bright
+```
+
+**Rationale for wide range (40-200):**
+- Accommodates different camera types (DSLR, smartphone, webcam)
+- Works in various lighting conditions (indoor, outdoor, cloudy, sunny)
+- Only rejects **extremely** bad lighting
+- Face verification should work in many real-world scenarios
+
+---
+
+### Validation Rules
+
+| Mean Intensity | Status | Action |
+|---|---|---|
+| 0 – 39 | `TOO_DARK` | Reject |
+| 40 – 200 | `GOOD_LIGHTING` | Accept |
+| 201 – 255 | `TOO_BRIGHT` | Reject |
+| Image is None | `INVALID_IMAGE` | Reject |
+
+---
+
+### Result Dictionary Format
+
+Every call to `check_lighting()` returns:
+
+```python
+{
+    "status"         : "GOOD_LIGHTING",    # or TOO_DARK / TOO_BRIGHT / INVALID_IMAGE
+    "mean_intensity" : 128.5,              # actual calculated brightness
+    "min_threshold"  : 40,                 # lower boundary
+    "max_threshold"  : 200,                # upper boundary
+    "message"        : "Lighting is good"  # human readable explanation
+}
+```
+
+---
+
+### Files Added on Day 4
+
+| File | Purpose |
+|---|---|
+| `src/lighting_check.py` | Lighting validation using mean pixel intensity |
+| `tests/test_day4.py` | Tests with intensity table for all images |
+
+**Note:** `config.py` already had `LIGHTING_MIN` and `LIGHTING_MAX` from Day 3 setup.
+
+---
+
+### Test Results
+
+| Test Image | Mean Intensity | Expected | Result |
+|---|---|---|---|
+| `dark_image.jpg` | 20 | `TOO_DARK` | ✅ Pass |
+| `normal_lighting.jpg` | 120 | `GOOD_LIGHTING` | ✅ Pass |
+| `bright_image.jpg` | 220 | `TOO_BRIGHT` | ✅ Pass |
+| `None` input | 0 | `INVALID_IMAGE` | ✅ Pass |
+
+---
+
+### Comparison — Lighting vs Blur Detection
+
+| Aspect | Blur Detection (Day 3) | Lighting Detection (Day 4) |
+|---|---|---|
+| What it measures | Edge sharpness | Overall brightness |
+| Method used | Laplacian variance | Mean pixel intensity |
+| Affected by content | Yes (faces vs landscapes) | No (consistent across content) |
+| Threshold tuning | Required (content-dependent) | Optional (usually 40-200 works) |
+| Complexity | Medium | Simple |
+
+**Key difference:** Lighting check is **content-independent** — the mean brightness of a face photo vs landscape photo is similar if they have the same lighting. Blur check is **content-dependent** because faces have naturally lower variance than textured scenes.
+
+---
+
+### When to Adjust Thresholds
+
+Most images should pass with default 40-200 range. Adjust only if:
+
+**Lower `LIGHTING_MIN` (from 40 to 30-35) if:**
+- Indoor photos in normal room lighting are being rejected
+- Evening/night photos with adequate artificial light are failing
+
+**Raise `LIGHTING_MAX` (from 200 to 210-220) if:**
+- Outdoor photos in bright daylight are being rejected
+- Photos with white/light backgrounds are failing
+
+The test file shows exact mean intensity values for all your images, making threshold adjustment easy.
+
+---
+
+### Project Status After Day 4
+
+| Module | Status |
+|---|---|
+| Face detection | ✅ Complete |
+| Blur detection | ✅ Complete |
+| Lighting detection | ✅ Complete |
+| Full pipeline integration | ⏳ Next (Day 5) |
+
+---
+
+### All Three Checks Summary
+
+The verification system now has three independent validation modules:
+
+**1. Face Detection** (`face_detector.py`)
+- Checks: Exactly one face present
+- Error codes: `NO_FACE`, `MULTIPLE_FACES`, `SUCCESS`
+
+**2. Clarity Check** (`clarity_check.py`)
+- Checks: Image is sharp and in-focus
+- Error codes: `TOO_BLURRY`, `CLEAR`
+- Threshold: `BLUR_THRESHOLD = 30` (face-specific)
+
+**3. Lighting Check** (`lighting_check.py`)
+- Checks: Proper exposure and brightness
+- Error codes: `TOO_DARK`, `TOO_BRIGHT`, `GOOD_LIGHTING`
+- Thresholds: `LIGHTING_MIN = 40`, `LIGHTING_MAX = 200`
+
+---
+
+*Status: Day 4 Complete — All Three Core Validation Modules Implemented*
