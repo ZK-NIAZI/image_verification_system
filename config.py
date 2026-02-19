@@ -47,4 +47,4 @@ LIGHTING_MAX = 200   # Above this = too bright/overexposed
 
 
 # ── Model Paths ───────────────────────────────────────────────
-FACE_DETECTOR_MODEL = "models/blaze_face_short_range.tflite"
+FACE_DETECTOR_MODEL = "models/blaze_face_short_range.tflite"    
