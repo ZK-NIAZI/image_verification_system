@@ -1,0 +1,500 @@
+{
+  "timestamp": "2026-02-23T15:07:14.055193",
+  "categories": {
+    "side_profiles": {
+      "description": "Side/profile views - should detect NO_FACE",
+      "total": 3,
+      "correct": 1,
+      "false_positives": 2,
+      "false_negatives": 0,
+      "results": [
+        {
+          "filename": "profile_45.jpg",
+          "path": "assets/edge_cases/side_profile\\profile_45.jpg",
+          "result": {
+            "valid": true,
+            "reason": "SUCCESS",
+            "message": "All validation checks passed. Image verified.",
+            "details": {
+              "lighting": {
+                "status": "GOOD_LIGHTING",
+                "mean_intensity": 88.96,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Lighting is good (mean: 88.96)."
+              },
+              "clarity": {
+                "status": "CLEAR",
+                "variance": 39.41,
+                "threshold": 30,
+                "message": "Image is clear (variance: 39.41)."
+              },
+              "face": {
+                "status": "SUCCESS",
+                "face_count": 1,
+                "message": "Face verified. Exactly one face detected."
+              }
+            }
+          },
+          "is_correct": false,
+          "issue_type": "false_positive"
+        },
+        {
+          "filename": "profile_90.jpg",
+          "path": "assets/edge_cases/side_profile\\profile_90.jpg",
+          "result": {
+            "valid": true,
+            "reason": "SUCCESS",
+            "message": "All validation checks passed. Image verified.",
+            "details": {
+              "lighting": {
+                "status": "GOOD_LIGHTING",
+                "mean_intensity": 90.94,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Lighting is good (mean: 90.94)."
+              },
+              "clarity": {
+                "status": "CLEAR",
+                "variance": 75.85,
+                "threshold": 30,
+                "message": "Image is clear (variance: 75.85)."
+              },
+              "face": {
+                "status": "SUCCESS",
+                "face_count": 1,
+                "message": "Face verified. Exactly one face detected."
+              }
+            }
+          },
+          "is_correct": false,
+          "issue_type": "false_positive"
+        },
+        {
+          "filename": "profile_back.jpg",
+          "path": "assets/edge_cases/side_profile\\profile_back.jpg",
+          "result": {
+            "valid": false,
+            "reason": "NO_FACE",
+            "message": "No face detected. Please upload a photo with your face visible.",
+            "details": {
+              "lighting": {
+                "status": "GOOD_LIGHTING",
+                "mean_intensity": 134.32,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Lighting is good (mean: 134.32)."
+              },
+              "clarity": {
+                "status": "CLEAR",
+                "variance": 350.09,
+                "threshold": 30,
+                "message": "Image is clear (variance: 350.09)."
+              },
+              "face": {
+                "status": "NO_FACE",
+                "face_count": 0,
+                "message": "No face detected. Please upload a clear photo of your face."
+              }
+            }
+          },
+          "is_correct": true,
+          "issue_type": null
+        }
+      ]
+    },
+    "accessories": {
+      "description": "Glasses, masks, hats - should mostly PASS",
+      "total": 4,
+      "correct": 3,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "results": [
+        {
+          "filename": "cap.jpg",
+          "path": "assets/edge_cases/accessories\\cap.jpg",
+          "result": {
+            "valid": true,
+            "reason": "SUCCESS",
+            "message": "All validation checks passed. Image verified.",
+            "details": {
+              "lighting": {
+                "status": "GOOD_LIGHTING",
+                "mean_intensity": 107.49,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Lighting is good (mean: 107.49)."
+              },
+              "clarity": {
+                "status": "CLEAR",
+                "variance": 397.75,
+                "threshold": 30,
+                "message": "Image is clear (variance: 397.75)."
+              },
+              "face": {
+                "status": "SUCCESS",
+                "face_count": 1,
+                "message": "Face verified. Exactly one face detected."
+              }
+            }
+          },
+          "is_correct": true,
+          "issue_type": null
+        },
+        {
+          "filename": "dark_glassess.jpg",
+          "path": "assets/edge_cases/accessories\\dark_glassess.jpg",
+          "result": {
+            "valid": true,
+            "reason": "SUCCESS",
+            "message": "All validation checks passed. Image verified.",
+            "details": {
+              "lighting": {
+                "status": "GOOD_LIGHTING",
+                "mean_intensity": 48.57,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Lighting is good (mean: 48.57)."
+              },
+              "clarity": {
+                "status": "CLEAR",
+                "variance": 37.46,
+                "threshold": 30,
+                "message": "Image is clear (variance: 37.46)."
+              },
+              "face": {
+                "status": "SUCCESS",
+                "face_count": 1,
+                "message": "Face verified. Exactly one face detected."
+              }
+            }
+          },
+          "is_correct": true,
+          "issue_type": null
+        },
+        {
+          "filename": "face_mask.jpg",
+          "path": "assets/edge_cases/accessories\\face_mask.jpg",
+          "result": {
+            "valid": true,
+            "reason": "SUCCESS",
+            "message": "All validation checks passed. Image verified.",
+            "details": {
+              "lighting": {
+                "status": "GOOD_LIGHTING",
+                "mean_intensity": 142.22,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Lighting is good (mean: 142.22)."
+              },
+              "clarity": {
+                "status": "CLEAR",
+                "variance": 87.08,
+                "threshold": 30,
+                "message": "Image is clear (variance: 87.08)."
+              },
+              "face": {
+                "status": "SUCCESS",
+                "face_count": 1,
+                "message": "Face verified. Exactly one face detected."
+              }
+            }
+          },
+          "is_correct": true,
+          "issue_type": null
+        },
+        {
+          "filename": "sun_glassess.jpg",
+          "path": "assets/edge_cases/accessories\\sun_glassess.jpg",
+          "result": {
+            "valid": false,
+            "reason": "NO_FACE",
+            "message": "No face detected. Please upload a photo with your face visible.",
+            "details": {
+              "lighting": {
+                "status": "GOOD_LIGHTING",
+                "mean_intensity": 112.15,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Lighting is good (mean: 112.15)."
+              },
+              "clarity": {
+                "status": "CLEAR",
+                "variance": 36.76,
+                "threshold": 30,
+                "message": "Image is clear (variance: 36.76)."
+              },
+              "face": {
+                "status": "NO_FACE",
+                "face_count": 0,
+                "message": "No face detected. Please upload a clear photo of your face."
+              }
+            }
+          },
+          "is_correct": false,
+          "issue_type": "false_negative"
+        }
+      ]
+    },
+    "backgrounds": {
+      "description": "Complex/cluttered backgrounds - should PASS if one clear face",
+      "total": 3,
+      "correct": 3,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "results": [
+        {
+          "filename": "crowded_photo.jpg",
+          "path": "assets/edge_cases/backgrounds\\crowded_photo.jpg",
+          "result": {
+            "valid": true,
+            "reason": "SUCCESS",
+            "message": "All validation checks passed. Image verified.",
+            "details": {
+              "lighting": {
+                "status": "GOOD_LIGHTING",
+                "mean_intensity": 73.8,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Lighting is good (mean: 73.80)."
+              },
+              "clarity": {
+                "status": "CLEAR",
+                "variance": 135.88,
+                "threshold": 30,
+                "message": "Image is clear (variance: 135.88)."
+              },
+              "face": {
+                "status": "SUCCESS",
+                "face_count": 1,
+                "message": "Face verified. Exactly one face detected."
+              }
+            }
+          },
+          "is_correct": true,
+          "issue_type": null
+        },
+        {
+          "filename": "with_nature.jpg",
+          "path": "assets/edge_cases/backgrounds\\with_nature.jpg",
+          "result": {
+            "valid": true,
+            "reason": "SUCCESS",
+            "message": "All validation checks passed. Image verified.",
+            "details": {
+              "lighting": {
+                "status": "GOOD_LIGHTING",
+                "mean_intensity": 111.49,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Lighting is good (mean: 111.49)."
+              },
+              "clarity": {
+                "status": "CLEAR",
+                "variance": 366.97,
+                "threshold": 30,
+                "message": "Image is clear (variance: 366.97)."
+              },
+              "face": {
+                "status": "SUCCESS",
+                "face_count": 1,
+                "message": "Face verified. Exactly one face detected."
+              }
+            }
+          },
+          "is_correct": true,
+          "issue_type": null
+        },
+        {
+          "filename": "with_poster.jpg",
+          "path": "assets/edge_cases/backgrounds\\with_poster.jpg",
+          "result": {
+            "valid": true,
+            "reason": "SUCCESS",
+            "message": "All validation checks passed. Image verified.",
+            "details": {
+              "lighting": {
+                "status": "GOOD_LIGHTING",
+                "mean_intensity": 91.99,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Lighting is good (mean: 91.99)."
+              },
+              "clarity": {
+                "status": "CLEAR",
+                "variance": 130.09,
+                "threshold": 30,
+                "message": "Image is clear (variance: 130.09)."
+              },
+              "face": {
+                "status": "SUCCESS",
+                "face_count": 1,
+                "message": "Face verified. Exactly one face detected."
+              }
+            }
+          },
+          "is_correct": true,
+          "issue_type": null
+        }
+      ]
+    },
+    "occlusion": {
+      "description": "Partially hidden faces - mixed results expected",
+      "total": 3,
+      "correct": 3,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "results": [
+        {
+          "filename": "partial_coveredge.jpg",
+          "path": "assets/edge_cases/occlusion\\partial_coveredge.jpg",
+          "result": {
+            "valid": true,
+            "reason": "SUCCESS",
+            "message": "All validation checks passed. Image verified.",
+            "details": {
+              "lighting": {
+                "status": "GOOD_LIGHTING",
+                "mean_intensity": 120.1,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Lighting is good (mean: 120.10)."
+              },
+              "clarity": {
+                "status": "CLEAR",
+                "variance": 321.96,
+                "threshold": 30,
+                "message": "Image is clear (variance: 321.96)."
+              },
+              "face": {
+                "status": "SUCCESS",
+                "face_count": 1,
+                "message": "Face verified. Exactly one face detected."
+              }
+            }
+          },
+          "is_correct": true,
+          "issue_type": null
+        },
+        {
+          "filename": "partial_coverhair.jpg",
+          "path": "assets/edge_cases/occlusion\\partial_coverhair.jpg",
+          "result": {
+            "valid": true,
+            "reason": "SUCCESS",
+            "message": "All validation checks passed. Image verified.",
+            "details": {
+              "lighting": {
+                "status": "GOOD_LIGHTING",
+                "mean_intensity": 96.01,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Lighting is good (mean: 96.01)."
+              },
+              "clarity": {
+                "status": "CLEAR",
+                "variance": 63.12,
+                "threshold": 30,
+                "message": "Image is clear (variance: 63.12)."
+              },
+              "face": {
+                "status": "SUCCESS",
+                "face_count": 1,
+                "message": "Face verified. Exactly one face detected."
+              }
+            }
+          },
+          "is_correct": true,
+          "issue_type": null
+        },
+        {
+          "filename": "partial_coverhand.jpg",
+          "path": "assets/edge_cases/occlusion\\partial_coverhand.jpg",
+          "result": {
+            "valid": true,
+            "reason": "SUCCESS",
+            "message": "All validation checks passed. Image verified.",
+            "details": {
+              "lighting": {
+                "status": "GOOD_LIGHTING",
+                "mean_intensity": 140.33,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Lighting is good (mean: 140.33)."
+              },
+              "clarity": {
+                "status": "CLEAR",
+                "variance": 110.08,
+                "threshold": 30,
+                "message": "Image is clear (variance: 110.08)."
+              },
+              "face": {
+                "status": "SUCCESS",
+                "face_count": 1,
+                "message": "Face verified. Exactly one face detected."
+              }
+            }
+          },
+          "is_correct": true,
+          "issue_type": null
+        }
+      ]
+    },
+    "lighting_edge": {
+      "description": "Extreme lighting conditions - should catch with lighting check",
+      "total": 2,
+      "correct": 2,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "results": [
+        {
+          "filename": "bad_bright.jpg",
+          "path": "assets/edge_cases/lighting\\bad_bright.jpg",
+          "result": {
+            "valid": false,
+            "reason": "TOO_BRIGHT",
+            "message": "Image is too bright/overexposed. Please reduce lighting.",
+            "details": {
+              "lighting": {
+                "status": "TOO_BRIGHT",
+                "mean_intensity": 218.87,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Image is too bright/overexposed (mean: 218.87, maximum: 200). Please upload a photo with less light."
+              }
+            }
+          },
+          "is_correct": true,
+          "issue_type": null
+        },
+        {
+          "filename": "bad_dark.jpg",
+          "path": "assets/edge_cases/lighting\\bad_dark.jpg",
+          "result": {
+            "valid": false,
+            "reason": "TOO_DARK",
+            "message": "Image is too dark/underexposed. Please upload a well-lit photo.",
+            "details": {
+              "lighting": {
+                "status": "TOO_DARK",
+                "mean_intensity": 13.12,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Image is too dark (mean: 13.12, minimum: 40). Please upload a well-lit photo."
+              }
+            }
+          },
+          "is_correct": true,
+          "issue_type": null
+        }
+      ]
+    }
+  },
+  "summary": {
+    "total_images": 15,
+    "correct": 12,
+    "false_positives": 2,
+    "false_negatives": 1,
+    "skipped": 0
+  }
+}
