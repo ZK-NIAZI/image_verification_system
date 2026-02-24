@@ -7,3 +7,12 @@ numpy           # Pixel intensity
 
 # Image Utility 
 Pillow             # Image open/save helper
+
+# API Framework
+fastapi            # REST API framework
+uvicorn[standard]  # ASGI server for FastAPI
+python-multipart   # Required for file uploads
+
+# Testing
+httpx              # Async HTTP client for FastAPI TestClient
+pytest             # Test runner
