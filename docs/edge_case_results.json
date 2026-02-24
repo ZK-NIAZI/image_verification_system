@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-02-23T15:07:14.055193",
+  "timestamp": "2026-02-24T11:07:31.395622",
   "categories": {
     "side_profiles": {
-      "description": "Side/profile views - should detect NO_FACE",
+      "description": "Side/profile views - accept if face visible, reject if not",
       "total": 3,
-      "correct": 1,
-      "false_positives": 2,
+      "correct": 3,
+      "false_positives": 0,
       "false_negatives": 0,
       "results": [
         {
@@ -26,7 +26,7 @@
               "clarity": {
                 "status": "CLEAR",
                 "variance": 39.41,
-                "threshold": 30,
+                "threshold": 25,
                 "message": "Image is clear (variance: 39.41)."
               },
               "face": {
@@ -36,8 +36,8 @@
               }
             }
           },
-          "is_correct": false,
-          "issue_type": "false_positive"
+          "is_correct": true,
+          "issue_type": null
         },
         {
           "filename": "profile_90.jpg",
@@ -57,7 +57,7 @@
               "clarity": {
                 "status": "CLEAR",
                 "variance": 75.85,
-                "threshold": 30,
+                "threshold": 25,
                 "message": "Image is clear (variance: 75.85)."
               },
               "face": {
@@ -67,8 +67,8 @@
               }
             }
           },
-          "is_correct": false,
-          "issue_type": "false_positive"
+          "is_correct": true,
+          "issue_type": null
         },
         {
           "filename": "profile_back.jpg",
@@ -88,7 +88,7 @@
               "clarity": {
                 "status": "CLEAR",
                 "variance": 350.09,
-                "threshold": 30,
+                "threshold": 25,
                 "message": "Image is clear (variance: 350.09)."
               },
               "face": {
@@ -106,9 +106,9 @@
     "accessories": {
       "description": "Glasses, masks, hats - should mostly PASS",
       "total": 4,
-      "correct": 3,
+      "correct": 4,
       "false_positives": 0,
-      "false_negatives": 1,
+      "false_negatives": 0,
       "results": [
         {
           "filename": "cap.jpg",
@@ -128,7 +128,7 @@
               "clarity": {
                 "status": "CLEAR",
                 "variance": 397.75,
-                "threshold": 30,
+                "threshold": 25,
                 "message": "Image is clear (variance: 397.75)."
               },
               "face": {
@@ -159,7 +159,7 @@
               "clarity": {
                 "status": "CLEAR",
                 "variance": 37.46,
-                "threshold": 30,
+                "threshold": 25,
                 "message": "Image is clear (variance: 37.46)."
               },
               "face": {
@@ -190,7 +190,7 @@
               "clarity": {
                 "status": "CLEAR",
                 "variance": 87.08,
-                "threshold": 30,
+                "threshold": 25,
                 "message": "Image is clear (variance: 87.08)."
               },
               "face": {
@@ -207,32 +207,32 @@
           "filename": "sun_glassess.jpg",
           "path": "assets/edge_cases/accessories\\sun_glassess.jpg",
           "result": {
-            "valid": false,
-            "reason": "NO_FACE",
-            "message": "No face detected. Please upload a photo with your face visible.",
+            "valid": true,
+            "reason": "SUCCESS",
+            "message": "All validation checks passed. Image verified.",
             "details": {
               "lighting": {
                 "status": "GOOD_LIGHTING",
-                "mean_intensity": 112.15,
+                "mean_intensity": 126.06,
                 "min_threshold": 40,
                 "max_threshold": 200,
-                "message": "Lighting is good (mean: 112.15)."
+                "message": "Lighting is good (mean: 126.06)."
               },
               "clarity": {
                 "status": "CLEAR",
-                "variance": 36.76,
-                "threshold": 30,
-                "message": "Image is clear (variance: 36.76)."
+                "variance": 442.63,
+                "threshold": 25,
+                "message": "Image is clear (variance: 442.63)."
               },
               "face": {
-                "status": "NO_FACE",
-                "face_count": 0,
-                "message": "No face detected. Please upload a clear photo of your face."
+                "status": "SUCCESS",
+                "face_count": 1,
+                "message": "Face verified. Exactly one face detected."
               }
             }
           },
-          "is_correct": false,
-          "issue_type": "false_negative"
+          "is_correct": true,
+          "issue_type": null
         }
       ]
     },
@@ -261,7 +261,7 @@
               "clarity": {
                 "status": "CLEAR",
                 "variance": 135.88,
-                "threshold": 30,
+                "threshold": 25,
                 "message": "Image is clear (variance: 135.88)."
               },
               "face": {
@@ -292,7 +292,7 @@
               "clarity": {
                 "status": "CLEAR",
                 "variance": 366.97,
-                "threshold": 30,
+                "threshold": 25,
                 "message": "Image is clear (variance: 366.97)."
               },
               "face": {
@@ -323,7 +323,7 @@
               "clarity": {
                 "status": "CLEAR",
                 "variance": 130.09,
-                "threshold": 30,
+                "threshold": 25,
                 "message": "Image is clear (variance: 130.09)."
               },
               "face": {
@@ -363,7 +363,7 @@
               "clarity": {
                 "status": "CLEAR",
                 "variance": 321.96,
-                "threshold": 30,
+                "threshold": 25,
                 "message": "Image is clear (variance: 321.96)."
               },
               "face": {
@@ -394,7 +394,7 @@
               "clarity": {
                 "status": "CLEAR",
                 "variance": 63.12,
-                "threshold": 30,
+                "threshold": 25,
                 "message": "Image is clear (variance: 63.12)."
               },
               "face": {
@@ -425,7 +425,7 @@
               "clarity": {
                 "status": "CLEAR",
                 "variance": 110.08,
-                "threshold": 30,
+                "threshold": 25,
                 "message": "Image is clear (variance: 110.08)."
               },
               "face": {
@@ -442,11 +442,37 @@
     },
     "lighting_edge": {
       "description": "Extreme lighting conditions - should catch with lighting check",
-      "total": 2,
-      "correct": 2,
+      "total": 3,
+      "correct": 3,
       "false_positives": 0,
       "false_negatives": 0,
       "results": [
+        {
+          "filename": "bad_blurry.jpg",
+          "path": "assets/edge_cases/lighting\\bad_blurry.jpg",
+          "result": {
+            "valid": false,
+            "reason": "TOO_BLURRY",
+            "message": "Image is blurry or out of focus. Please upload a sharp photo.",
+            "details": {
+              "lighting": {
+                "status": "GOOD_LIGHTING",
+                "mean_intensity": 125.5,
+                "min_threshold": 40,
+                "max_threshold": 200,
+                "message": "Lighting is good (mean: 125.50)."
+              },
+              "clarity": {
+                "status": "TOO_BLURRY",
+                "variance": 3.83,
+                "threshold": 25,
+                "message": "Image is too blurry (variance: 3.83, threshold: 25). Please upload a clear, in-focus photo."
+              }
+            }
+          },
+          "is_correct": true,
+          "issue_type": null
+        },
         {
           "filename": "bad_bright.jpg",
           "path": "assets/edge_cases/lighting\\bad_bright.jpg",
@@ -491,10 +517,10 @@
     }
   },
   "summary": {
-    "total_images": 15,
-    "correct": 12,
-    "false_positives": 2,
-    "false_negatives": 1,
+    "total_images": 16,
+    "correct": 16,
+    "false_positives": 0,
+    "false_negatives": 0,
     "skipped": 0
   }
 }

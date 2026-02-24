@@ -32,7 +32,7 @@
 # They have naturally higher variance and will give wrong results.
 #
 # Recommended for face verification systems:
-BLUR_THRESHOLD = 30  # Tuned for face photos (adjust based on YOUR test images)
+BLUR_THRESHOLD = 25  # Tuned for face photos (adjust based on YOUR test images)
 
 
 # ── Face Detection ────────────────────────────────────────────

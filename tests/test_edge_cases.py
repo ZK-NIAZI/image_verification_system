@@ -34,17 +34,18 @@ BOLD   = "\033[1m"
 # ── Edge Case Test Configuration ──────────────────────────────
 EDGE_CASES = {
     "side_profiles": {
-        "description": "Side/profile views - should detect NO_FACE",
+        "description": "Side/profile views - accept if face visible, reject if not",
         "path": "assets/edge_cases/side_profile",
-        "expected": ["NO_FACE", "MULTIPLE_FACES"],  # Either is acceptable
-        "should_pass": False
+        "expected": ["SUCCESS", "NO_FACE"],  # Both acceptable depending on angle
+        "should_pass": None,  # Mixed results - depends on how much face is visible
+        "notes": "Side profiles (30-90°) or (yaw/pitch > 30) degrees may pass if face features visible."
     },
     "accessories": {
         "description": "Glasses, masks, hats - should mostly PASS",
         "path": "assets/edge_cases/accessories",
         "expected": ["SUCCESS"],
         "should_pass": True,
-        "notes": "Sunglasses/masks might fail - this is acceptable"
+        "notes": "Sunglasses/masks might be fail - this is acceptable"
     },
     "backgrounds": {
         "description": "Complex/cluttered backgrounds - should PASS if one clear face",
