@@ -24,12 +24,12 @@ INVALID_IMAGE  = "INVALID_IMAGE"
 
 
 # ── Main Function ─────────────────────────────────────────────
-def check_lighting(image):
+def check_lighting(image, gray=None):
     """
     Checks if an image has acceptable lighting levels.
 
     How it works:
-    1. Convert image to grayscale
+    1. Convert image to grayscale (or use pre-computed grayscale)
     2. Calculate mean pixel intensity (average brightness)
     3. Compare against min/max thresholds
     4. Reject if too dark or too bright
@@ -38,6 +38,10 @@ def check_lighting(image):
       0 = pure black
       128 = medium gray
       255 = pure white
+
+    Args:
+        image: BGR numpy array from cv2.imread
+        gray:  Optional pre-computed grayscale image (avoids re-conversion)
 
     Returns a dictionary:
     {
@@ -54,8 +58,9 @@ def check_lighting(image):
         return _result(INVALID_IMAGE, 0.0, LIGHTING_MIN, LIGHTING_MAX,
                        "Image could not be loaded. Check the file path.")
 
-    # Step 2 — Convert to grayscale
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # Step 2 — Convert to grayscale (or reuse pre-computed)
+    if gray is None:
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # Step 3 — Calculate mean pixel intensity (average brightness)
     mean_intensity = np.mean(gray)

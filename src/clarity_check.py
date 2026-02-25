@@ -22,15 +22,19 @@ INVALID_IMAGE  = "INVALID_IMAGE"
 
 
 # ── Main Function
-def check_clarity(image):
+def check_clarity(image, gray=None):
     """
     Checks if an image is clear or blurry using Laplacian variance.
 
     How it works:
-    1. Convert image to grayscale
+    1. Convert image to grayscale (or use pre-computed grayscale)
     2. Apply Laplacian operator (detects edges)
     3. Calculate variance (measures edge sharpness)
     4. Compare against threshold
+
+    Args:
+        image: BGR numpy array from cv2.imread
+        gray:  Optional pre-computed grayscale image (avoids re-conversion)
 
     Returns a dictionary:
     {
@@ -46,8 +50,9 @@ def check_clarity(image):
         return _result(INVALID_IMAGE, 0.0, BLUR_THRESHOLD,
                        "Image could not be loaded. Check the file path.")
 
-    # Step 2 — Convert to grayscale (Laplacian works on grayscale)
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # Step 2 — Convert to grayscale (or reuse pre-computed)
+    if gray is None:
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # Step 3 — Apply Laplacian filter and calculate variance
     laplacian = cv2.Laplacian(gray, cv2.CV_64F)

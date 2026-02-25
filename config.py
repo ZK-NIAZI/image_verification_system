@@ -47,4 +47,17 @@ LIGHTING_MAX = 200   # Above this = too bright/overexposed
 
 
 # ── Model Paths ───────────────────────────────────────────────
-FACE_DETECTOR_MODEL = "models/blaze_face_short_range.tflite"    
+FACE_DETECTOR_MODEL = "models/blaze_face_short_range.tflite"
+
+
+# ── Image Preprocessing ──────────────────────────────────────
+# Cap the largest image dimension before running any checks.
+# Smaller images = faster processing at every stage.
+# 640px is a good balance between speed and detection accuracy.
+MAX_IMAGE_DIMENSION = 640   # pixels (longest side)
+
+
+# ── Performance Logging ───────────────────────────────────────
+# When True, verify() returns per-stage timing data and the API
+# logs inference latency.
+PERF_LOGGING_ENABLED = True

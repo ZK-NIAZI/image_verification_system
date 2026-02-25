@@ -12,14 +12,12 @@
 # ─────────────────────────────────────────────────────────────
 
 import os
-import tempfile
-import uuid
 from datetime import datetime, timezone
 
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 
-from verifier import verify
+from verifier import verify, verify_from_bytes
 
 
 # ── Constants ─────────────────────────────────────────────────
@@ -46,7 +44,11 @@ app = FastAPI(
 
 # ── POST /verify ──────────────────────────────────────────────
 @app.post("/verify")
-async def verify_image(file: UploadFile = File(...)):
+async def verify_image(
+    request: Request,
+    file: UploadFile = File(...),
+    verbose: bool = Query(False, description="Include full details, timing, and stage breakdowns"),
+):
     """
     Upload an image file for verification.
 
@@ -55,8 +57,13 @@ async def verify_image(file: UploadFile = File(...)):
       2. Clarity  (too blurry)
       3. Face detection (no face / multiple faces)
 
-    Returns a structured JSON response with the verification result.
+    By default returns a minimal response (success, valid, reason, message).
+    Pass ?verbose=true or header X-Verbose: true for full details.
     """
+
+    # Check header as alternative to query param
+    if not verbose:
+        verbose = request.headers.get("X-Verbose", "").lower() in ("true", "1", "yes")
 
     # ── Step 1: Validate file extension ───────────────────────
     filename = file.filename or ""
@@ -121,27 +128,31 @@ async def verify_image(file: UploadFile = File(...)):
             },
         )
 
-    # ── Step 4: Save to temp file and run verification ────────
-    tmp_path = None
+    # ── Step 4: Run verification directly from bytes ──────────
     try:
-        # Write to a temp file so the verifier can read it with cv2.imread
-        suffix = ext if ext else ".jpg"
-        tmp_fd, tmp_path = tempfile.mkstemp(suffix=suffix)
-        os.close(tmp_fd)
+        result = verify_from_bytes(contents)
 
-        with open(tmp_path, "wb") as f:
-            f.write(contents)
-
-        # Run the verification pipeline
-        result = verify(tmp_path)
+        # ── Build response based on verbosity ─────────────────
+        if verbose:
+            # Full response: everything the pipeline returns
+            response_content = {
+                "success": True,
+                "result": result,
+                "inference_time_ms": result.get("inference_time_ms"),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        else:
+            # Minimal response: just the essentials
+            response_content = {
+                "success": True,
+                "valid": result["valid"],
+                "reason": result["reason"],
+                "message": result["message"],
+            }
 
         return JSONResponse(
             status_code=200,
-            content={
-                "success": True,
-                "result": result,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-            },
+            content=response_content,
         )
 
     except Exception as e:
@@ -155,12 +166,6 @@ async def verify_image(file: UploadFile = File(...)):
                 },
             },
         )
-
-    finally:
-        # Clean up temp file
-        if tmp_path and os.path.exists(tmp_path):
-            os.remove(tmp_path)
-
 
 # ── GET /health ───────────────────────────────────────────────
 @app.get("/health")

@@ -8,11 +8,19 @@
 #   3. Face detection (slowest)
 #
 # Short-circuits on first failure to save processing time.
+#
+# Performance optimizations:
+#   - Image resize cap (MAX_IMAGE_DIMENSION) before any checks
+#   - Shared grayscale conversion for lighting + clarity
+#   - verify_from_bytes() for in-memory decode (skips disk I/O)
+#   - Per-stage timing instrumentation via time.perf_counter()
 # ─────────────────────────────────────────────────────────────
 
 import cv2
 import sys
 import os
+import time
+import numpy as np
 
 # Add src directory to path for imports
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -33,6 +41,8 @@ else:
         print("Make sure verifier.py is in the project root with src/ folder.")
         sys.exit(1)
 
+from config import MAX_IMAGE_DIMENSION, PERF_LOGGING_ENABLED
+
 
 # ── Error Codes ───────────────────────────────────────────────
 # All possible validation results
@@ -46,6 +56,28 @@ ERROR_CODES = {
     "MULTIPLE_FACES": "Multiple faces detected. Please upload a photo with only one person.",
     "MODEL_NOT_FOUND": "Face detection model file is missing.",
 }
+
+
+# ── Image Preprocessing ──────────────────────────────────────
+def _preprocess_image(image):
+    """
+    Resize image so the longest side <= MAX_IMAGE_DIMENSION.
+    Also pre-compute grayscale (shared by lighting + clarity checks).
+
+    Returns:
+        (resized_image, gray_image)
+    """
+    h, w = image.shape[:2]
+    max_dim = max(h, w)
+
+    if max_dim > MAX_IMAGE_DIMENSION:
+        scale = MAX_IMAGE_DIMENSION / max_dim
+        new_w = int(w * scale)
+        new_h = int(h * scale)
+        image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    return image, gray
 
 
 # ── Main Verification Function ────────────────────────────────
@@ -65,66 +97,162 @@ def verify(image_path):
     
     Returns:
         dict: {
-            "valid": bool,        # True if all checks pass, False otherwise
-            "reason": str,        # Error code (SUCCESS or failure reason)
-            "message": str,       # Human-readable explanation
-            "details": dict       # Detailed results from each check (optional)
+            "valid": bool,              # True if all checks pass
+            "reason": str,              # Error code
+            "message": str,             # Human-readable explanation
+            "details": dict,            # Detailed results from each check
+            "inference_time_ms": float, # Total inference time in milliseconds
+            "stage_times_ms": dict      # Per-stage timing breakdown
         }
-    
-    Example:
-        result = verify("photo.jpg")
-        if result["valid"]:
-            print("Image verified successfully!")
-        else:
-            print(f"Verification failed: {result['message']}")
     """
+    stage_times = {}
+    t_start = time.perf_counter()
     
     # Step 1: Load image
+    t0 = time.perf_counter()
     image = cv2.imread(image_path)
-    if image is None:
-        return _build_result(False, "INVALID_IMAGE")
+    stage_times["load"] = _elapsed_ms(t0)
     
-    # Step 2: Check lighting 
-    lighting_result = check_lighting(image)
+    if image is None:
+        return _build_result(False, "INVALID_IMAGE",
+                             stage_times=stage_times, t_start=t_start)
+    
+    # Step 2: Preprocess (resize + grayscale)
+    t0 = time.perf_counter()
+    image, gray = _preprocess_image(image)
+    stage_times["preprocess"] = _elapsed_ms(t0)
+    
+    # Step 3: Check lighting (pass pre-computed grayscale)
+    t0 = time.perf_counter()
+    lighting_result = check_lighting(image, gray=gray)
+    stage_times["lighting"] = _elapsed_ms(t0)
+    
     if lighting_result["status"] != GOOD_LIGHTING:
         return _build_result(False, lighting_result["status"], {
             "lighting": lighting_result
-        })
+        }, stage_times=stage_times, t_start=t_start)
     
-    # Step 3: Check clarity/blur 
-    clarity_result = check_clarity(image)
+    # Step 4: Check clarity/blur (pass pre-computed grayscale)
+    t0 = time.perf_counter()
+    clarity_result = check_clarity(image, gray=gray)
+    stage_times["clarity"] = _elapsed_ms(t0)
+    
     if clarity_result["status"] != CLEAR:
         return _build_result(False, clarity_result["status"], {
             "lighting": lighting_result,
             "clarity": clarity_result
-        })
+        }, stage_times=stage_times, t_start=t_start)
     
-    # Step 4: Check face detection 
+    # Step 5: Check face detection (on resized image)
+    t0 = time.perf_counter()
     face_result = detect_face(image)
+    stage_times["face_detection"] = _elapsed_ms(t0)
+    
     if face_result["status"] != SUCCESS:
         return _build_result(False, face_result["status"], {
             "lighting": lighting_result,
             "clarity": clarity_result,
             "face": face_result
-        })
+        }, stage_times=stage_times, t_start=t_start)
     
     # All checks passed - image is valid
     return _build_result(True, "SUCCESS", {
         "lighting": lighting_result,
         "clarity": clarity_result,
         "face": face_result
-    })
+    }, stage_times=stage_times, t_start=t_start)
+
+
+# ── In-memory verification (no disk I/O) ─────────────────────
+def verify_from_bytes(image_bytes):
+    """
+    Verify an image from raw bytes (e.g. from an upload).
+    Decodes in-memory — no temp file needed.
+    
+    Args:
+        image_bytes (bytes): Raw image file bytes (JPEG/PNG)
+    
+    Returns:
+        Same dict as verify()
+    """
+    stage_times = {}
+    t_start = time.perf_counter()
+    
+    # Step 1: Decode from memory
+    t0 = time.perf_counter()
+    np_arr = np.frombuffer(image_bytes, np.uint8)
+    image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+    stage_times["load"] = _elapsed_ms(t0)
+    
+    if image is None:
+        return _build_result(False, "INVALID_IMAGE",
+                             stage_times=stage_times, t_start=t_start)
+    
+    # Step 2: Preprocess (resize + grayscale)
+    t0 = time.perf_counter()
+    image, gray = _preprocess_image(image)
+    stage_times["preprocess"] = _elapsed_ms(t0)
+    
+    # Step 3: Check lighting
+    t0 = time.perf_counter()
+    lighting_result = check_lighting(image, gray=gray)
+    stage_times["lighting"] = _elapsed_ms(t0)
+    
+    if lighting_result["status"] != GOOD_LIGHTING:
+        return _build_result(False, lighting_result["status"], {
+            "lighting": lighting_result
+        }, stage_times=stage_times, t_start=t_start)
+    
+    # Step 4: Check clarity/blur
+    t0 = time.perf_counter()
+    clarity_result = check_clarity(image, gray=gray)
+    stage_times["clarity"] = _elapsed_ms(t0)
+    
+    if clarity_result["status"] != CLEAR:
+        return _build_result(False, clarity_result["status"], {
+            "lighting": lighting_result,
+            "clarity": clarity_result
+        }, stage_times=stage_times, t_start=t_start)
+    
+    # Step 5: Check face detection
+    t0 = time.perf_counter()
+    face_result = detect_face(image)
+    stage_times["face_detection"] = _elapsed_ms(t0)
+    
+    if face_result["status"] != SUCCESS:
+        return _build_result(False, face_result["status"], {
+            "lighting": lighting_result,
+            "clarity": clarity_result,
+            "face": face_result
+        }, stage_times=stage_times, t_start=t_start)
+    
+    return _build_result(True, "SUCCESS", {
+        "lighting": lighting_result,
+        "clarity": clarity_result,
+        "face": face_result
+    }, stage_times=stage_times, t_start=t_start)
+
+
+# ── Timing helper ────────────────────────────────────────────
+def _elapsed_ms(t0):
+    """Return milliseconds elapsed since t0."""
+    return round((time.perf_counter() - t0) * 1000, 2)
 
 
 # ── Helper: Build result dictionary ──────────────────────────
-def _build_result(valid, reason, details=None):
-    """Build standardized result dictionary"""
-    return {
+def _build_result(valid, reason, details=None, stage_times=None, t_start=None):
+    """Build standardized result dictionary with optional timing data."""
+    total_ms = round((time.perf_counter() - t_start) * 1000, 2) if t_start else 0
+    result = {
         "valid": valid,
         "reason": reason,
         "message": ERROR_CODES.get(reason, "Unknown error"),
-        "details": details or {}
+        "details": details or {},
     }
+    if PERF_LOGGING_ENABLED:
+        result["inference_time_ms"] = total_ms
+        result["stage_times_ms"] = stage_times or {}
+    return result
 
 
 # ── Utility: Batch verification ──────────────────────────────
@@ -157,14 +285,19 @@ if __name__ == "__main__":
     image_path = sys.argv[1]
     result = verify(image_path)
     
-    print("\n" + "─" * 50)
+    print("\n" + "-" * 50)
     print(f"  Image Verification Result")
-    print("─" * 50)
+    print("-" * 50)
     print(f"  File   : {image_path}")
     print(f"  Valid  : {result['valid']}")
     print(f"  Reason : {result['reason']}")
     print(f"  Message: {result['message']}")
-    print("─" * 50 + "\n")
+    if PERF_LOGGING_ENABLED:
+        print(f"  Time   : {result.get('inference_time_ms', 'N/A')} ms")
+        stage_times = result.get('stage_times_ms', {})
+        if stage_times:
+            print(f"  Stages : {stage_times}")
+    print("-" * 50 + "\n")
     
     # Exit with appropriate code (0 = success, 1 = failure)
     sys.exit(0 if result["valid"] else 1)

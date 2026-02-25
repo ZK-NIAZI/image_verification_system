@@ -22,12 +22,13 @@ ASSETS_DIR = os.path.join(
 )
 
 
-# ── Helper ────────────────────────────────────────────────────
-def _upload(filename):
+# ── Helper ────────────────────────────────────────────────────────
+def _upload(filename, verbose=True):
     """Upload a file from the assets directory to POST /verify."""
     filepath = os.path.join(ASSETS_DIR, filename)
+    params = {"verbose": "true"} if verbose else {}
     with open(filepath, "rb") as f:
-        return client.post("/verify", files={"file": (filename, f, "image/jpeg")})
+        return client.post("/verify", files={"file": (filename, f, "image/jpeg")}, params=params)
 
 
 # ── Health Check ──────────────────────────────────────────────
@@ -144,3 +145,47 @@ class TestResponseStructure:
         assert "reason" in result
         assert "message" in result
         assert "details" in result
+
+
+# ── Minimal (default) Response ─────────────────────────────────────
+class TestMinimalResponse:
+    def test_default_response_is_minimal(self):
+        """Without ?verbose=true the response should not include 'result' or 'timestamp'."""
+        data = _upload("one_face.jpg", verbose=False).json()
+        assert data["success"] is True
+        assert data["valid"] is True
+        assert data["reason"] == "SUCCESS"
+        assert "message" in data
+        # These should NOT be present in the minimal response
+        assert "result" not in data
+        assert "timestamp" not in data
+        assert "inference_time_ms" not in data
+
+    def test_verbose_via_query_param(self):
+        """?verbose=true should return the full response."""
+        data = _upload("one_face.jpg", verbose=True).json()
+        assert "result" in data
+        assert "timestamp" in data
+        assert "inference_time_ms" in data
+
+    def test_verbose_via_header(self):
+        """X-Verbose: true header should also return the full response."""
+        filepath = os.path.join(ASSETS_DIR, "one_face.jpg")
+        with open(filepath, "rb") as f:
+            response = client.post(
+                "/verify",
+                files={"file": ("one_face.jpg", f, "image/jpeg")},
+                headers={"X-Verbose": "true"},
+            )
+        data = response.json()
+        assert "result" in data
+        assert "timestamp" in data
+
+    def test_minimal_failure_response(self):
+        """Failed validation should also be minimal by default."""
+        data = _upload("dark_image.jpg", verbose=False).json()
+        assert data["success"] is True
+        assert data["valid"] is False
+        assert data["reason"] == "TOO_DARK"
+        assert "message" in data
+        assert "result" not in data
