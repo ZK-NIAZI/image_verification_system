@@ -2,7 +2,7 @@
 mediapipe           # lightweight face detection
 
 # Image Processing 
-opencv-python   # Laplacian blur check
+opencv-python-headless   # Laplacian blur check (headless = no GUI libs needed)
 numpy           # Pixel intensity
 
 # Image Utility 
