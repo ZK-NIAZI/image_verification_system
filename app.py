@@ -15,6 +15,7 @@ import os
 from datetime import datetime, timezone
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from verifier import verify, verify_from_bytes
@@ -39,6 +40,15 @@ app = FastAPI(
         "good lighting, clarity, and exactly one face detected."
     ),
     version=API_VERSION,
+)
+
+
+# ── CORS ──────────────────────────────────────────────────────
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],       # Tighten to your mobile app domain once known
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
 )
 
 
