@@ -57,6 +57,18 @@ FACE_DETECTOR_MODEL = "models/blaze_face_short_range.tflite"
 MAX_IMAGE_DIMENSION = 640   # pixels (longest side)
 
 
+# ── API Server Configuration ──────────────────────────────────
+# Host and port for the FastAPI server
+# Can be overridden with environment variables:
+#   HOST=0.0.0.0 python app.py
+#   PORT=9000 python app.py
+API_HOST = "0.0.0.0"   # Listen on all interfaces
+API_PORT = 8000        # Default port
+# Base URL for the API (used in docs and external references)
+# Override with BASE_URL environment variable:
+#   BASE_URL=https://api.example.com python app.py
+BASE_URL = "https://aw4g8kwkg8go0kcokgs8k80w.62.171.148.170.sslip.io"
+
 # ── Performance Logging ───────────────────────────────────────
 # When True, verify() returns per-stage timing data and the API
 # logs inference latency.

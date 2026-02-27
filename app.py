@@ -8,7 +8,10 @@
 #   GET  /health  — Health check
 #
 # Run:
-#   uvicorn app:app --reload --port 8000
+#   python app.py
+# 
+# Configure with environment variables:
+#   HOST=0.0.0.0 PORT=9000 python app.py
 # ─────────────────────────────────────────────────────────────
 
 import os
@@ -16,8 +19,10 @@ from datetime import datetime, timezone
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from verifier import verify, verify_from_bytes
+from config import API_HOST, API_PORT, BASE_URL
 
 
 # ── Constants ─────────────────────────────────────────────────
@@ -32,6 +37,9 @@ ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 
 
 # ── FastAPI App ───────────────────────────────────────────────
+# Get base URL from environment or config
+base_url = os.getenv("BASE_URL", BASE_URL)
+
 app = FastAPI(
     title="AI Image Verification API",
     description=(
@@ -39,6 +47,18 @@ app = FastAPI(
         "good lighting, clarity, and exactly one face detected."
     ),
     version=API_VERSION,
+    servers=[{"url": base_url, "description": "Production Server"}],
+)
+
+
+# ── CORS Configuration ────────────────────────────────────────
+# Allow cross-origin requests to fix CORS errors
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
 )
 
 
@@ -191,4 +211,13 @@ async def health_check():
 # ── Run directly with: python app.py ─────────────────────────
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    
+    # Get host and port from environment variables with config defaults
+    host = os.getenv("HOST", API_HOST)
+    port = int(os.getenv("PORT", API_PORT))
+    
+    print(f"🚀 Starting AI Image Verification API...")
+    print(f"   Base URL: http://{host}:{port}")
+    print(f"   Docs: http://{host}:{port}/docs")
+    
+    uvicorn.run("app:app", host=host, port=port, reload=True)
